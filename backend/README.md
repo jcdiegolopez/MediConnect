@@ -1,4 +1,4 @@
-```markdown
+
 # MediConnect Global - Backend
 
 **MediConnect Global** es una aplicación web para la gestión de clínicas médicas, diseñada como parte del **Proyecto 4 de CC3088 - Bases de Datos 1**, ciclo 1, 2025, de la Universidad del Valle de Guatemala. Este repositorio contiene el backend, implementado con **Node.js**, **Express**, **PostgreSQL**, y **Prisma**, que proporciona una API REST para gestionar pacientes, citas, consultas, facturas, y más.
@@ -21,7 +21,6 @@ medi-connect-global/
 │   ├── views.sql               # Vistas SQL (vista_pacientes, vista_citas, vista_facturas)
 ├── src/
 │   ├── controllers/            # Controladores para las rutas
-│   ├── generated/              # Cliente de prisma generado
 │   ├── routes/                # Rutas de la API 
 │   ├── services/              # Lógica de negocio
 │   └── middleware/            # Middleware para validaciones 
