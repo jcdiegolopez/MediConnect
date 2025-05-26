@@ -1,0 +1,196 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pacientes {
+  id              Int                 @id @default(autoincrement())
+  nombre          String
+  apellido        String
+  fecha_nacimiento DateTime
+  genero          String?
+  correo          String              @unique
+  telefono        String?
+  ultima_consulta DateTime?
+  citas           Citas[]
+  consultas       Consultas[]
+  historiales     Historiales_Medicos[]
+  examenes        Examenes_Medicos[]
+  facturas        Facturas[]
+  alergias        Pacientes_Alergias[]
+}
+
+model Doctores {
+  id              Int                 @id @default(autoincrement())
+  nombre          String
+  apellido        String
+  especialidad_id Int
+  numero_colegiado String             @unique
+  especialidad    Especialidades      @relation(fields: [especialidad_id], references: [id])
+  citas           Citas[]
+  consultas       Consultas[]
+  clinicas        Doctores_Clinicas[]
+}
+
+model Especialidades {
+  id              Int                 @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  doctores        Doctores[]
+}
+
+model Clinicas {
+  id              Int                 @id @default(autoincrement())
+  nombre          String
+  pais            String?
+  ciudad          String?
+  telefono        String?
+  citas           Citas[]
+  consultas       Consultas[]
+  doctores        Doctores_Clinicas[]
+}
+
+model Consultas {
+  id              Int                 @id @default(autoincrement())
+  paciente_id     Int
+  doctor_id       Int
+  clinica_id      Int
+  fecha           DateTime
+  diagnostico     String?
+  notas           Json
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  doctor          Doctores            @relation(fields: [doctor_id], references: [id])
+  clinica         Clinicas            @relation(fields: [clinica_id], references: [id])
+  recetas         Recetas[]
+  examenes        Examenes_Medicos[]
+  facturas_items  Facturas_Items[]
+}
+
+model Historiales_Medicos {
+  id              Int                 @id @default(autoincrement())
+  paciente_id     Int
+  fecha           DateTime?
+  diagnostico     String?
+  tratamientos    String?
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+}
+
+model Citas {
+  id              Int                 @id @default(autoincrement())
+  paciente_id     Int
+  doctor_id       Int
+  clinica_id      Int
+  fecha           DateTime
+  estado          CitasEstado         @default(Programada)
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  doctor          Doctores            @relation(fields: [doctor_id], references: [id])
+  clinica         Clinicas            @relation(fields: [clinica_id], references: [id])
+}
+
+enum CitasEstado {
+  Programada
+  Completada
+  Cancelada
+}
+
+model Medicamentos {
+  id              Int                 @id @default(autoincrement())
+  nombre          String
+  fabricante      String?
+  recetas         Recetas[]
+}
+
+model Recetas {
+  id              Int                 @id @default(autoincrement())
+  consulta_id     Int
+  medicamento_id  Int
+  dosis           String?
+  consulta        Consultas           @relation(fields: [consulta_id], references: [id])
+  medicamento     Medicamentos        @relation(fields: [medicamento_id], references: [id])
+}
+
+model Alergias {
+  id              Int                 @id @default(autoincrement())
+  nombre_alergia  String
+  gravedad        AlergiasGravedad
+  pacientes       Pacientes_Alergias[]
+}
+
+enum AlergiasGravedad {
+  Leve
+  Moderada
+  Severa
+}
+
+model Examenes_Medicos {
+  id              Int                 @id @default(autoincrement())
+  paciente_id     Int
+  tipo_examen_id  Int
+  consulta_id     Int?
+  fecha           DateTime
+  resultado       String?
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  tipo_examen     Tipos_Examenes      @relation(fields: [tipo_examen_id], references: [id])
+  consulta        Consultas?          @relation(fields: [consulta_id], references: [id])
+  facturas_items  Facturas_Items[]
+}
+
+model Tipos_Examenes {
+  id              Int                 @id @default(autoincrement())
+  nombre          String
+  costo           Decimal
+  examenes        Examenes_Medicos[]
+}
+
+model Doctores_Clinicas {
+  doctor_id       Int
+  clinica_id      Int
+  doctor          Doctores            @relation(fields: [doctor_id], references: [id])
+  clinica         Clinicas            @relation(fields: [clinica_id], references: [id])
+  @@id([doctor_id, clinica_id])
+}
+
+model Pacientes_Alergias {
+  paciente_id     Int
+  alergia_id      Int
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  alergia         Alergias            @relation(fields: [alergia_id], references: [id])
+  @@id([paciente_id, alergia_id])
+}
+
+model Facturas {
+  id              Int                 @id @default(autoincrement())
+  paciente_id     Int
+  monto           Decimal
+  fecha           DateTime
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  items           Facturas_Items[]
+}
+
+model Facturas_Items {
+  id              Int                 @id @default(autoincrement())
+  factura_id      Int
+  tipo_item       FacturasItemsTipo
+  consulta_id     Int?
+  examen_id       Int?
+  costo           Decimal
+  factura         Facturas            @relation(fields: [factura_id], references: [id])
+  consulta        Consultas?          @relation(fields: [consulta_id], references: [id])
+  examen          Examenes_Medicos?   @relation(fields: [examen_id], references: [id])
+}
+
+enum FacturasItemsTipo {
+  Consulta
+  Examen
+}
