@@ -14,6 +14,7 @@ class PacientesController {
   async getAllPacientes(req, res) {
     try {
       const pacientes = await pacientesService.getAllPacientes();
+      console.log(pacientes)
       res.json(pacientes);
     } catch (error) {
       res.status(500).json({ error: error.message });

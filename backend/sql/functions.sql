@@ -1,8 +1,8 @@
 -- Función: CalcularEdad
-CREATE OR REPLACE FUNCTION public.calcular_edad(fecha_nacimiento DATE)
+CREATE OR REPLACE FUNCTION public.calcular_edad(fecha_nacimiento TIMESTAMP WITHOUT TIME ZONE)
 RETURNS INTEGER AS $$
 BEGIN
-    RETURN DATE_PART('year', AGE(CURRENT_DATE, fecha_nacimiento));
+    RETURN DATE_PART('year', AGE(CURRENT_DATE, fecha_nacimiento::DATE));
 END;
 $$ LANGUAGE plpgsql;
 

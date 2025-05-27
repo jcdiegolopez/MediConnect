@@ -19,7 +19,7 @@ class PacientesService {
     return await prisma.$queryRaw`
       SELECT id, nombre, apellido, fecha_nacimiento,
              calcular_edad(fecha_nacimiento) AS edad,
-             (SELECT COUNT(*) FROM public."Historiales_Medicos" h WHERE h.paciente_id = p.id) AS historiales,
+             (SELECT COUNT(*)::INTEGER FROM public."Historiales_Medicos" h WHERE h.paciente_id = p.id) AS historiales,
              (SELECT STRING_AGG(a.nombre_alergia, ', ')
               FROM public."Pacientes_Alergias" pa
               JOIN public."Alergias" a ON pa.alergia_id = a.id
