@@ -18,7 +18,7 @@ medi-connect-global/
 │   ├── schema.sql              # Triggers, funciones y views en un solo script
 │   ├── functions.sql           # Funciones SQL (calcular_edad, contar_consultas_doctor)
 │   ├── triggers.sql            # Triggers SQL (verificar_disponibilidad_doctor, etc.)
-│   ├── views.sql               # Vistas SQL (vista_pacientes, vista_citas, vista_facturas)
+│   ├── views.sql               # Vistas SQL (vista_pacientes, vista_citas, vista_consultas)
 ├── src/
 │   ├── controllers/            # Controladores para las rutas
 │   ├── routes/                # Rutas de la API 

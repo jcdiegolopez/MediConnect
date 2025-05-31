@@ -3,92 +3,66 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const validateRequest = require('../middleware/validateRequest');
-const reportesController = require('../controllers/reportesController');
+const ReportesController = require('../controllers/reportesController');
 
 router.get(
-  '/consultas-por-especialidad',
+  '/patients-by-age-group',
   [
-    check('fechaInicio')
+    check('genero').optional().isIn(['Masculino', 'Femenino']).withMessage('Género debe ser Masculino o Femenino'),
+    check('clinicaId').optional().isInt({ min: 1 }).withMessage('Clínica ID debe ser un entero positivo'),
+    check('alergia').optional().notEmpty().withMessage('Alergia no puede estar vacía'),
+    check('minConsultas').optional().isInt({ min: 0 }).withMessage('Mínimo de consultas debe ser un entero no negativo'),
+    check('fechaRegistroInicio')
       .optional()
       .matches(/^\d{4}-\d{2}-\d{2}$/)
-      .withMessage('Fecha de inicio debe ser YYYY-MM-DD')
-      .custom((value) => {
-        if (!new Date(value).getTime()) throw new Error('Fecha de inicio inválida');
-        return true;
-      }),
-    check('fechaFin')
+      .withMessage('Fecha de registro inicio debe ser YYYY-MM-DD'),
+    check('fechaRegistroFin')
       .optional()
       .matches(/^\d{4}-\d{2}-\d{2}$/)
-      .withMessage('Fecha de fin debe ser YYYY-MM-DD')
-      .custom((value) => {
-        if (!new Date(value).getTime()) throw new Error('Fecha de fin inválida');
-        return true;
-      }),
+      .withMessage('Fecha de registro fin debe ser YYYY-MM-DD'),
+    validateRequest
+  ],
+  ReportesController.patientsByAgeGroup
+);
+
+router.get(
+  '/doctor-consultation-counts',
+  [
     check('especialidadId').optional().isInt({ min: 1 }).withMessage('Especialidad ID debe ser un entero positivo'),
     check('clinicaId').optional().isInt({ min: 1 }).withMessage('Clínica ID debe ser un entero positivo'),
-    check('doctorId').optional().isInt({ min: 1 }).withMessage('Doctor ID debe ser un entero positivo'),
+    check('fechaInicio')
+      .optional()
+      .matches(/^\d{4}-\d{2}-\d{2}$/)
+      .withMessage('Fecha de inicio debe ser YYYY-MM-DD'),
+    check('fechaFin')
+      .optional()
+      .matches(/^\d{4}-\d{2}-\d{2}$/)
+      .withMessage('Fecha de fin debe ser YYYY-MM-DD'),
     check('diagnostico').optional().notEmpty().withMessage('Diagnóstico no puede estar vacío'),
-    validateRequest,
+    check('minConsultas').optional().isInt({ min: 0 }).withMessage('Mínimo de consultas debe ser un entero no negativo'),
+    validateRequest
   ],
-  reportesController.consultasPorEspecialidad
+  ReportesController.doctorConsultationCounts
 );
 
 router.get(
-  '/facturacion-por-paciente',
+  '/clinic-activity',
   [
+    check('clinicaId').optional().isInt({ min: 1 }).withMessage('Clínica ID debe ser un entero positivo'),
     check('fechaInicio')
       .optional()
       .matches(/^\d{4}-\d{2}-\d{2}$/)
-      .withMessage('Fecha de inicio debe ser YYYY-MM-DD')
-      .custom((value) => {
-        if (!new Date(value).getTime()) throw new Error('Fecha de inicio inválida');
-        return true;
-      }),
+      .withMessage('Fecha de inicio debe ser YYYY-MM-DD'),
     check('fechaFin')
       .optional()
       .matches(/^\d{4}-\d{2}-\d{2}$/)
-      .withMessage('Fecha de fin debe ser YYYY-MM-DD')
-      .custom((value) => {
-        if (!new Date(value).getTime()) throw new Error('Fecha de fin inválida');
-        return true;
-      }),
-    check('pacienteId').optional().isInt({ min: 1 }).withMessage('Paciente ID debe ser un entero positivo'),
-    check('tipoItem').optional().isIn(['Consulta', 'Examen']).withMessage('Tipo de ítem debe ser Consulta o Examen'),
-    check('montoMin').optional().isFloat({ min: 0 }).withMessage('Monto mínimo debe ser un número positivo'),
-    check('montoMax').optional().isFloat({ min: 0 }).withMessage('Monto máximo debe ser un número positivo'),
-    check('clinicaId').optional().isInt({ min: 1 }).withMessage('Clínica ID debe ser un entero positivo'),
-    validateRequest,
+      .withMessage('Fecha de fin debe ser YYYY-MM-DD'),
+    check('especialidadId').optional().isInt({ min: 1 }).withMessage('Especialidad ID debe ser un entero positivo'),
+    check('genero').optional().isIn(['Masculino', 'Femenino']).withMessage('Género debe ser Masculino o Femenino'),
+    check('diagnostico').optional().notEmpty().withMessage('Diagnóstico no puede estar vacío'),
+    validateRequest
   ],
-  reportesController.facturacionPorPaciente
-);
-
-router.get(
-  '/examenes-costos-por-tipo',
-  [
-    check('fechaInicio')
-      .optional()
-      .matches(/^\d{4}-\d{2}-\d{2}$/)
-      .withMessage('Fecha de inicio debe ser YYYY-MM-DD')
-      .custom((value) => {
-        if (!new Date(value).getTime()) throw new Error('Fecha de inicio inválida');
-        return true;
-      }),
-    check('fechaFin')
-      .optional()
-      .matches(/^\d{4}-\d{2}-\d{2}$/)
-      .withMessage('Fecha de fin debe ser YYYY-MM-DD')
-      .custom((value) => {
-        if (!new Date(value).getTime()) throw new Error('Fecha de fin inválida');
-        return true;
-      }),
-    check('tipoExamenId').optional().isInt({ min: 1 }).withMessage('Tipo de examen ID debe ser un entero positivo'),
-    check('clinicaId').optional().isInt({ min: 1 }).withMessage('Clínica ID debe ser un entero positivo'),
-    check('pacienteId').optional().isInt({ min: 1 }).withMessage('Paciente ID debe ser un entero positivo'),
-    check('costoMin').optional().isFloat({ min: 0 }).withMessage('Costo mínimo debe ser un número positivo'),
-    check('costoMax').optional().isFloat({ min: 0 }).withMessage('Costo máximo debe ser un número positivo'),
-    validateRequest,
-  ],
-  reportesController.examenesCostosPorTipo
+  ReportesController.clinicActivity
 );
 
 module.exports = router;

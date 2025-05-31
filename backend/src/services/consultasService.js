@@ -20,29 +20,29 @@ class ConsultasService {
     }
   }
 
-  async getAllConsultas() {
-    return await prisma.consultas.findMany({
-      include: {
-        paciente: { select: { nombre: true, apellido: true } },
-        doctor: { select: { nombre: true, apellido: true } },
-        clinica: { select: { nombre: true } },
-        recetas: { include: { medicamento: true } },
-      },
-    });
+  async getAllConsultas(filters = {}) {
+    try {
+      const where = {};
+      console.log('Filters:', filters);
+      if (filters.pacienteId) where.paciente_id = parseInt(filters.pacienteId);
+      if (filters.doctorId) where.doctor_id = parseInt(filters.doctorId);
+
+      return await prisma.vistaConsultas.findMany({ where });
+    } catch (error) {
+      throw new Error(`Error al obtener consultas: ${error.message}`);
+    }
   }
 
   async getConsultaById(id) {
-    const consulta = await prisma.consultas.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        paciente: { select: { nombre: true, apellido: true } },
-        doctor: { select: { nombre: true, apellido: true } },
-        clinica: { select: { nombre: true } },
-        recetas: { include: { medicamento: true } },
-      },
-    });
-    if (!consulta) throw new Error('Consulta no encontrada');
-    return consulta;
+    try {
+      const consulta = await prisma.vistaConsultas.findUnique({
+        where: { id: parseInt(id) },
+      });
+      if (!consulta) throw new Error('Consulta no encontrada');
+      return consulta;
+    } catch (error) {
+      throw new Error(`Error al obtener consulta: ${error.message}`);
+    }
   }
 
   async updateConsulta(id, data) {

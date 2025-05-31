@@ -16,32 +16,29 @@ class CitasService {
   }
 
   async getAllCitas(filters = {}) {
-    const where = {};
-    if (filters.pacienteId) where.paciente_id = parseInt(filters.pacienteId);
-    if (filters.doctorId) where.doctor_id = parseInt(filters.doctorId);
-    if (filters.estado) where.estado = filters.estado;
+    try {
+      const where = {};
+      console.log('Filters:', filters);
+      if (filters.pacienteId) where.paciente_id = parseInt(filters.pacienteId);
+      if (filters.doctorId) where.doctor_id = parseInt(filters.doctorId);
+      if (filters.estado) where.estado = filters.estado;
 
-    return await prisma.citas.findMany({
-      where,
-      include: {
-        paciente: { select: { nombre: true, apellido: true } },
-        doctor: { select: { nombre: true, apellido: true } },
-        clinica: { select: { nombre: true } },
-      },
-    });
+      return await prisma.vistaCitas.findMany({ where });
+    } catch (error) {
+      throw new Error(`Error al obtener citas: ${error.message}`);
+    }
   }
 
   async getCitaById(id) {
-    const cita = await prisma.citas.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        paciente: { select: { nombre: true, apellido: true } },
-        doctor: { select: { nombre: true, apellido: true } },
-        clinica: { select: { nombre: true } },
-      },
-    });
-    if (!cita) throw new Error('Cita no encontrada');
-    return cita;
+    try {
+      const cita = await prisma.vistaCitas.findUnique({
+        where: { id: parseInt(id) },
+      });
+      if (!cita) throw new Error('Cita no encontrada');
+      return cita;
+    } catch (error) {
+      throw new Error(`Error al obtener cita: ${error.message}`);
+    }
   }
 
   async updateCita(id, data) {

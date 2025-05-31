@@ -1,279 +1,148 @@
-
-const { PrismaClient } = require('../generated/prisma');
+const ReportesService = require('../services/reportesService');
 const { Parser } = require('json2csv');
-const prisma = new PrismaClient();
 
 class ReportesController {
-  async consultasPorEspecialidad(req, res) {
-    const { fechaInicio, fechaFin, especialidadId, clinicaId, doctorId, diagnostico } = req.query;
-    
-    // Default dates if not provided
-    const defaultFechaInicio = '2025-01-01';
-    const defaultFechaFin = '2025-12-31';
-    
-    // Validate dates
-    const isValidDate = (dateStr) => {
-      if (!dateStr) return false;
-      const date = new Date(dateStr);
-      return !isNaN(date.getTime()) && dateStr.match(/^\d{4}-\d{2}-\d{2}/);
-    };
-    
-    const startDate = isValidDate(fechaInicio) ? fechaInicio : defaultFechaInicio;
-    const endDate = isValidDate(fechaFin) ? fechaFin : defaultFechaFin;
-
-    let where = 'WHERE c.fecha BETWEEN $1::TIMESTAMP AND $2::TIMESTAMP';
-    const params = [startDate, endDate];
-    let paramIndex = 3;
-
-    if (especialidadId) {
-      where += ` AND e.id = $${paramIndex++}`;
-      params.push(parseInt(especialidadId));
-    }
-    if (clinicaId) {
-      where += ` AND c.clinica_id = $${paramIndex++}`;
-      params.push(parseInt(clinicaId));
-    }
-    if (doctorId) {
-      where += ` AND c.doctor_id = $${paramIndex++}`;
-      params.push(parseInt(doctorId));
-    }
-    if (diagnostico) {
-      where += ` AND c.diagnostico ILIKE $${paramIndex++}`;
-      params.push(`%${diagnostico}%`);
-    }
-
+  async patientsByAgeGroup(req, res) {
     try {
-      const data = await prisma.$queryRawUnsafe(`
-        SELECT e.nombre AS especialidad, COUNT(c.id)::INTEGER AS consultas
-        FROM public."Consultas" c
-        JOIN public."Doctores" d ON c.doctor_id = d.id
-        JOIN public."Especialidades" e ON d.especialidad_id = e.id
-        ${where}
-        GROUP BY e.nombre
-        ORDER BY consultas DESC
-      `, ...params);
-
-      // Transform data to ensure BigInt is converted to Number
-      const serializedData = data.map(row => ({
-        especialidad: row.especialidad,
-        consultas: Number(row.consultas)
-      }));
+      const { genero, clinicaId, alergia, minConsultas, fechaRegistroInicio, fechaRegistroFin, format } = req.query;
+      const data = await ReportesService.getPatientsByAgeGroup({
+        genero,
+        clinicaId,
+        alergia,
+        minConsultas,
+        fechaRegistroInicio,
+        fechaRegistroFin
+      });
 
       const chart = {
         type: 'bar',
         data: {
-          labels: serializedData.map(row => row.especialidad),
+          labels: data.map(row => row.age_group),
           datasets: [{
-            label: 'Consultas por Especialidad',
-            data: serializedData.map(row => row.consultas),
-            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF'],
-          }],
+            label: 'Patients by Age Group',
+            data: data.map(row => row.patient_count),
+            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0']
+          }]
         },
         options: {
           responsive: true,
           scales: {
-            y: { beginAtZero: true, title: { display: true, text: 'Número de Consultas' } },
-            x: { title: { display: true, text: 'Especialidad' } },
-          },
-        },
+            y: { beginAtZero: true, title: { display: true, text: 'Number of Patients' } },
+            x: { title: { display: true, text: 'Age Group' } }
+          }
+        }
       };
 
-      if (req.query.format === 'csv') {
+      if (format === 'csv') {
         const parser = new Parser();
-        const csv = parser.parse(serializedData);
+        const csv = parser.parse(data);
         res.header('Content-Type', 'text/csv');
-        res.attachment('consultas_por_especialidad.csv');
+        res.attachment('patients_by_age_group.csv');
         return res.send(csv);
       }
 
-      res.json({ data: serializedData, chart });
+      res.json({ data, chart });
     } catch (error) {
-      console.error('Error en consultasPorEspecialidad:', error);
-      res.status(500).json({ error: 'Error al generar el reporte', details: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
-  async facturacionPorPaciente(req, res) {
-    const { fechaInicio, fechaFin, pacienteId, tipoItem, montoMin, montoMax, clinicaId } = req.query;
-    const defaultFechaInicio = '2025-01-01';
-    const defaultFechaFin = '2025-12-31';
-    
-    const isValidDate = (dateStr) => {
-      if (!dateStr) return false;
-      const date = new Date(dateStr);
-      return !isNaN(date.getTime()) && dateStr.match(/^\d{4}-\d{2}-\d{2}/);
-    };
-    
-    const startDate = isValidDate(fechaInicio) ? fechaInicio : defaultFechaInicio;
-    const endDate = isValidDate(fechaFin) ? fechaFin : defaultFechaFin;
-
-    let where = 'WHERE f.fecha BETWEEN $1::TIMESTAMP AND $2::TIMESTAMP';
-    const params = [startDate, endDate];
-    let paramIndex = 3;
-
-    if (pacienteId) {
-      where += ` AND f.paciente_id = $${paramIndex++}`;
-      params.push(parseInt(pacienteId));
-    }
-    if (tipoItem) {
-      where += ` AND fi.tipo_item = $${paramIndex++}`;
-      params.push(tipoItem);
-    }
-    if (montoMin) {
-      where += ` AND f.monto >= $${paramIndex++}`;
-      params.push(parseFloat(montoMin));
-    }
-    if (montoMax) {
-      where += ` AND f.monto <= $${paramIndex++}`;
-      params.push(parseFloat(montoMax));
-    }
-    if (clinicaId) {
-      where += ` AND (c.clinica_id = $${paramIndex} OR em.clinica_id = $${paramIndex})`;
-      params.push(parseInt(clinicaId));
-      paramIndex++;
-    }
-
+  async doctorConsultationCounts(req, res) {
     try {
-      const data = await prisma.$queryRawUnsafe(`
-        SELECT f.id, f.fecha, f.monto, p.nombre || ' ' || p.apellido AS paciente,
-               STRING_AGG(fi.tipo_item || ': $' || fi.costo, ', ') AS items
-        FROM public."Facturas" f
-        JOIN public."Pacientes" p ON f.paciente_id = p.id
-        LEFT JOIN public."Facturas_Items" fi ON f.id = fi.factura_id
-        LEFT JOIN public."Consultas" c ON fi.consulta_id = c.id
-        LEFT JOIN public."Examenes_Medicos" em ON fi.examen_id = em.id
-        ${where}
-        GROUP BY f.id, f.fecha, f.monto, p.nombre, p.apellido
-        ORDER BY f.fecha DESC
-      `, ...params);
-
-      // Transform data to ensure BigInt is converted to Number
-      const serializedData = data.map(row => ({
-        id: Number(row.id),
-        fecha: row.fecha.toISOString(),
-        monto: Number(row.monto),
-        paciente: row.paciente,
-        items: row.items
-      }));
-
-      const chart = {
-        type: 'pie',
-        data: {
-          labels: serializedData.map(row => row.paciente),
-          datasets: [{
-            label: 'Facturación por Paciente',
-            data: serializedData.map(row => row.monto),
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-          }],
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: 'top' } },
-        },
-      };
-
-      if (req.query.format === 'csv') {
-        const parser = new Parser();
-        const csv = parser.parse(serializedData);
-        res.header('Content-Type', 'text/csv');
-        res.attachment('facturacion_por_paciente.csv');
-        return res.send(csv);
-      }
-
-      res.json({ data: serializedData, chart });
-    } catch (error) {
-      console.error('Error en facturacionPorPaciente:', error);
-      res.status(500).json({ error: 'Error al generar el reporte', details: error.message });
-    }
-  }
-
-  async examenesCostosPorTipo(req, res) {
-    const { fechaInicio, fechaFin, tipoExamenId, clinicaId, pacienteId, costoMin, costoMax } = req.query;
-    const defaultFechaInicio = '2025-01-01';
-    const defaultFechaFin = '2025-12-31';
-    
-    const isValidDate = (dateStr) => {
-      if (!dateStr) return false;
-      const date = new Date(dateStr);
-      return !isNaN(date.getTime()) && dateStr.match(/^\d{4}-\d{2}-\d{2}/);
-    };
-    
-    const startDate = isValidDate(fechaInicio) ? fechaInicio : defaultFechaInicio;
-    const endDate = isValidDate(fechaFin) ? fechaFin : defaultFechaFin;
-
-    let where = 'WHERE em.fecha BETWEEN $1::TIMESTAMP AND $2::TIMESTAMP';
-    const params = [startDate, endDate];
-    let paramIndex = 3;
-
-    if (tipoExamenId) {
-      where += ` AND em.tipo_examen_id = $${paramIndex++}`;
-      params.push(parseInt(tipoExamenId));
-    }
-    if (clinicaId) {
-      where += ` AND em.clinica_id = $${paramIndex++}`;
-      params.push(parseInt(clinicaId));
-    }
-    if (pacienteId) {
-      where += ` AND em.paciente_id = $${paramIndex++}`;
-      params.push(parseInt(pacienteId));
-    }
-    if (costoMin) {
-      where += ` AND te.costo >= $${paramIndex++}`;
-      params.push(parseFloat(costoMin));
-    }
-    if (costoMax) {
-      where += ` AND te.costo <= $${paramIndex++}`;
-      params.push(parseFloat(costoMax));
-    }
-
-    try {
-      const data = await prisma.$queryRawUnsafe(`
-        SELECT te.nombre AS tipo_examen, COUNT(em.id)::INTEGER AS conteo, SUM(te.costo) AS costo_total
-        FROM public."Examenes_Medicos" em
-        JOIN public."Tipos_Examenes" te ON em.tipo_examen_id = te.id
-        ${where}
-        GROUP BY te.nombre
-        ORDER BY costo_total DESC
-      `, ...params);
-
-      // Transform data to ensure BigInt is converted to Number
-      const serializedData = data.map(row => ({
-        tipo_examen: row.tipo_examen,
-        conteo: Number(row.conteo),
-        costo_total: Number(row.costo_total)
-      }));
+      const { especialidadId, clinicaId, fechaInicio, fechaFin, diagnostico, minConsultas, format } = req.query;
+      const data = await ReportesService.getDoctorConsultationCounts({
+        especialidadId,
+        clinicaId,
+        fechaInicio,
+        fechaFin,
+        diagnostico,
+        minConsultas
+      });
 
       const chart = {
         type: 'bar',
         data: {
-          labels: serializedData.map(row => row.tipo_examen),
+          labels: data.map(row => row.doctor),
           datasets: [{
-            label: 'Costos por Tipo de Examen',
-            data: serializedData.map(row => row.costo_total),
-            backgroundColor: ['#4BC0C0', '#FF6384', '#36A2EB', '#FFCE56', '#9966FF'],
-          }],
+            label: 'Consultations by Doctor',
+            data: data.map(row => row.consultations),
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+          }]
         },
         options: {
           responsive: true,
           scales: {
-            y: { beginAtZero: true, title: { display: true, text: 'Costo Total ($)' } },
-            x: { title: { display: true, text: 'Tipo de Examen' } },
-          },
-        },
+            y: { beginAtZero: true, title: { display: true, text: 'Number of Consultations' } },
+            x: { title: { display: true, text: 'Doctor' } }
+          }
+        }
       };
 
-      if (req.query.format === 'csv') {
+      if (format === 'csv') {
         const parser = new Parser();
-        const csv = parser.parse(serializedData);
+        const csv = parser.parse(data);
         res.header('Content-Type', 'text/csv');
-        res.attachment('examenes_costos_por_tipo.csv');
+        res.attachment('doctor_consultation_counts.csv');
         return res.send(csv);
       }
 
-      res.json({ data: serializedData, chart });
+      res.json({ data, chart });
     } catch (error) {
-      console.error('Error en examenesCostosPorTipo:', error);
-      res.status(500).json({ error: 'Error al generar el reporte', details: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async clinicActivity(req, res) {
+    try {
+      const { clinicaId, fechaInicio, fechaFin, especialidadId, genero, diagnostico, format } = req.query;
+      const data = await ReportesService.getClinicActivity({
+        clinicaId,
+        fechaInicio,
+        fechaFin,
+        especialidadId,
+        genero,
+        diagnostico
+      });
+
+      const chart = {
+        type: 'bar',
+        data: {
+          labels: data.map(row => row.clinica),
+          datasets: [
+            {
+              label: 'Total Consultations',
+              data: data.map(row => row.total_consultations),
+              backgroundColor: '#36A2EB'
+            },
+            {
+              label: 'Average Patient Age',
+              data: data.map(row => row.avg_patient_age),
+              backgroundColor: '#FF6384',
+              yAxisID: 'y2'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Consultations' } },
+            y2: { beginAtZero: true, position: 'right', title: { display: true, text: 'Average Age' } },
+            x: { title: { display: true, text: 'Clinic' } }
+          }
+        }
+      };
+
+      if (format === 'csv') {
+        const parser = new Parser();
+        const csv = parser.parse(data);
+        res.header('Content-Type', 'text/csv');
+        res.attachment('clinic_activity.csv');
+        return res.send(csv);
+      }
+
+      res.json({ data, chart });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
 }

@@ -12,7 +12,7 @@ class ConsultasController {
 
   async getAllConsultas(req, res) {
     try {
-      const consultas = await consultasService.getAllConsultas();
+      const consultas = await consultasService.getAllConsultas(req.query);
       res.json(consultas);
     } catch (error) {
       res.status(500).json({ error: error.message });

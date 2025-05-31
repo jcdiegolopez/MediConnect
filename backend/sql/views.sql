@@ -21,30 +21,31 @@ SELECT
     c.fecha,
     c.estado,
     p.nombre || ' ' || p.apellido AS paciente,
+    p.id AS paciente_id,
     d.nombre || ' ' || d.apellido AS doctor,
+    d.id AS doctor_id,
     cl.nombre AS clinica
 FROM public."Citas" c
 INNER JOIN public."Pacientes" p ON c.paciente_id = p.id
 INNER JOIN public."Doctores" d ON c.doctor_id = d.id
 INNER JOIN public."Clinicas" cl ON c.clinica_id = cl.id;
 
--- Vista: Vista_Facturas
-CREATE OR REPLACE VIEW public.vista_facturas AS
+-- Vista: Vista_Consultas
+CREATE OR REPLACE VIEW public.vista_consultas AS
 SELECT 
-    f.id,
-    f.fecha,
-    f.monto,
+    c.id,
+    c.fecha,
     p.nombre || ' ' || p.apellido AS paciente,
-    STRING_AGG(
-        fi.tipo_item || ': $' || fi.costo || 
-        CASE 
-            WHEN fi.consulta_id IS NOT NULL THEN ' (Consulta #' || fi.consulta_id || ')'
-            WHEN fi.examen_id IS NOT NULL THEN ' (Examen #' || fi.examen_id || ')'
-            ELSE ''
-        END, 
-        '; '
-    ) AS items
-FROM public."Facturas" f
-INNER JOIN public."Pacientes" p ON f.paciente_id = p.id
-LEFT JOIN public."Facturas_Items" fi ON f.id = fi.factura_id
-GROUP BY f.id, p.nombre, p.apellido;
+    p.id AS paciente_id,
+    d.nombre || ' ' || d.apellido AS doctor,
+    d.id AS doctor_id,
+    cl.nombre AS clinica,
+    c.diagnostico,
+    STRING_AGG(m.nombre || ': ' || COALESCE(r.dosis, 'Sin dosis'), '; ') AS recetas
+FROM public."Consultas" c
+INNER JOIN public."Pacientes" p ON c.paciente_id = p.id
+INNER JOIN public."Doctores" d ON c.doctor_id = d.id
+INNER JOIN public."Clinicas" cl ON c.clinica_id = cl.id
+LEFT JOIN public."Recetas" r ON c.id = r.consulta_id
+LEFT JOIN public."Medicamentos" m ON r.medicamento_id = m.id
+GROUP BY c.id, c.fecha, p.nombre, p.apellido, p.id, d.nombre, d.apellido, d.id, cl.nombre, c.diagnostico;

@@ -194,3 +194,50 @@ enum FacturasItemsTipo {
   Consulta
   Examen
 }
+
+
+model VistaPacientes {
+  id              Int      @id
+  nombre          String
+  apellido        String
+  fecha_nacimiento DateTime
+  edad            Int
+  total_historiales Int
+  alergias        String?
+  @@map("vista_pacientes")
+}
+
+model VistaCitas {
+  id          Int      @id
+  fecha       DateTime
+  estado      CitasEstado
+  paciente    String
+  paciente_id Int
+  doctor      String
+  doctor_id   Int
+  clinica     String
+  @@map("vista_citas")
+}
+
+model VistaConsultas {
+  id          Int      @id
+  fecha       DateTime
+  paciente    String
+  paciente_id Int
+  doctor      String
+  doctor_id   Int
+  clinica     String
+  diagnostico String?
+  recetas     String?
+  @@map("vista_consultas")
+}
+
+model CalcularEdad {
+  result Int @id
+  @@ignore
+}
+
+model ContarConsultasDoctor {
+  result Int @id
+  @@ignore
+}
