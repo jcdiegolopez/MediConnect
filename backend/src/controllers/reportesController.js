@@ -34,12 +34,21 @@ class ReportesController {
       };
 
       if (format === 'csv') {
-        const parser = new Parser();
-        const csv = parser.parse(data);
-        res.header('Content-Type', 'text/csv');
-        res.attachment('patients_by_age_group.csv');
-        return res.send(csv);
+        if (!data || data.length === 0) {
+          return res.status(400).json({ error: 'No hay datos para exportar a CSV.' });
+        }
+
+        try {
+          const parser = new Parser();
+          const csv = parser.parse(data);
+          res.header('Content-Type', 'text/csv');
+          res.attachment('patients_by_age_group.csv');
+          return res.send(csv);
+        } catch (csvError) {
+          return res.status(500).json({ error: `Error generando CSV: ${csvError.message}` });
+        }
       }
+      
 
       res.json({ data, chart });
     } catch (error) {
@@ -78,12 +87,21 @@ class ReportesController {
         }
       };
 
+
       if (format === 'csv') {
-        const parser = new Parser();
-        const csv = parser.parse(data);
-        res.header('Content-Type', 'text/csv');
-        res.attachment('doctor_consultation_counts.csv');
-        return res.send(csv);
+        if (!data || data.length === 0) {
+          return res.status(400).json({ error: 'No hay datos para exportar a CSV.' });
+        }
+
+        try {
+          const parser = new Parser();
+          const csv = parser.parse(data);
+          res.header('Content-Type', 'text/csv');
+          res.attachment('doctor_consultation_counts.csv');
+          return res.send(csv);
+        } catch (csvError) {
+          return res.status(500).json({ error: `Error generando CSV: ${csvError.message}` });
+        }
       }
 
       res.json({ data, chart });
@@ -133,13 +151,21 @@ class ReportesController {
       };
 
       if (format === 'csv') {
-        const parser = new Parser();
-        const csv = parser.parse(data);
-        res.header('Content-Type', 'text/csv');
-        res.attachment('clinic_activity.csv');
-        return res.send(csv);
-      }
+        if (!data || data.length === 0) {
+          return res.status(400).json({ error: 'No hay datos para exportar a CSV.' });
+        }
 
+        try {
+          const parser = new Parser();
+          const csv = parser.parse(data);
+          res.header('Content-Type', 'text/csv');
+          res.attachment('clinic_activity.csv');
+          return res.send(csv);
+        } catch (csvError) {
+          return res.status(500).json({ error: `Error generando CSV: ${csvError.message}` });
+        }
+      }
+      
       res.json({ data, chart });
     } catch (error) {
       res.status(500).json({ error: error.message });

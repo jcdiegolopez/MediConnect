@@ -13,21 +13,30 @@ class ReportesService {
         where += ` AND p.genero = $${paramIndex++}`;
         params.push(genero);
       }
+
       if (clinicaId) {
         where += ` AND c.clinica_id = $${paramIndex++}`;
         params.push(parseInt(clinicaId));
       }
+
       if (alergia) {
-        where += ` AND pa.alergia_id IN (SELECT id FROM public."Alergias" WHERE nombre_alergia ILIKE $${paramIndex++})`;
+        where += ` AND pa.alergia_id IN (
+          SELECT id FROM public."Alergias" WHERE nombre_alergia ILIKE $${paramIndex++}
+        )`;
         params.push(`%${alergia}%`);
       }
+
       if (minConsultas) {
-        where += ` AND (SELECT COUNT(*) FROM public."Consultas" c2 WHERE c2.paciente_id = p.id) >= $${paramIndex++}`;
+        where += ` AND (
+          SELECT COUNT(*) FROM public."Consultas" c2 WHERE c2.paciente_id = p.id
+        ) >= $${paramIndex++}`;
         params.push(parseInt(minConsultas));
       }
+
       if (fechaRegistroInicio && fechaRegistroFin) {
-        where += ` AND p.ultima_consulta::DATE BETWEEN $${paramIndex++} AND $${paramIndex++}`;
+        where += ` AND p.ultima_consulta::DATE BETWEEN $${paramIndex}::DATE AND $${paramIndex + 1}::DATE`;
         params.push(fechaRegistroInicio, fechaRegistroFin);
+        paramIndex += 2;
       }
 
       const data = await prisma.$queryRawUnsafe(`
@@ -38,7 +47,7 @@ class ReportesService {
             WHEN public.calcular_edad(p.fecha_nacimiento) BETWEEN 31 AND 50 THEN '31-50'
             ELSE 'Mayor de 50'
           END AS age_group,
-          COUNT(p.id)::INTEGER AS patient_count
+          COUNT(DISTINCT p.id)::INTEGER AS patient_count
         FROM public."Pacientes" p
         LEFT JOIN public."Consultas" c ON p.id = c.paciente_id
         LEFT JOIN public."Pacientes_Alergias" pa ON p.id = pa.paciente_id
@@ -49,12 +58,13 @@ class ReportesService {
 
       return data.map(row => ({
         age_group: row.age_group,
-        patient_count: Number(row.patient_count)
+        patient_count: Number(row.patient_count),
       }));
     } catch (error) {
       throw new Error(`Error fetching patients by age group: ${error.message}`);
     }
   }
+
 
   async getDoctorConsultationCounts({ especialidadId, clinicaId, fechaInicio, fechaFin, diagnostico, minConsultas }) {
     try {
@@ -117,7 +127,7 @@ class ReportesService {
         if (fechaInicio && fechaFin) {
         fechaInicioIndex = paramIndex;
         fechaFinIndex = paramIndex + 1;
-        where += ` AND c.fecha::DATE BETWEEN $${fechaInicioIndex} AND $${fechaFinIndex}`;
+        where += ` AND c.fecha::DATE BETWEEN $${fechaInicioIndex}::DATE AND $${fechaFinIndex}::DATE`;
         params.push(fechaInicio, fechaFin);
         paramIndex += 2;
         }
@@ -135,7 +145,7 @@ class ReportesService {
         }
 
         const totalConsultationsSQL = (fechaInicioIndex && fechaFinIndex)
-        ? `SUM(public.contar_consultas_doctor(d.id, $${fechaInicioIndex}, $${fechaFinIndex}))::INTEGER AS total_consultations`
+        ? `SUM(public.contar_consultas_doctor(d.id, $${fechaInicioIndex}::DATE, $${fechaFinIndex}::DATE))::INTEGER AS total_consultations`
         : `0 AS total_consultations`;
 
         const data = await prisma.$queryRawUnsafe(`

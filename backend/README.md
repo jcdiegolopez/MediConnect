@@ -26,6 +26,7 @@ medi-connect-global/
 │   └── middleware/            # Middleware para validaciones 
 ├── .env                       # Variables de entorno 
 ├── .gitignore                 # Archivos y carpetas ignorados por Git
+├── api.postman_collection.json    # Json endpoints de prueba postman
 ├── package.json               # Dependencias y scripts
 ├── README.md                  # Este archivo
 └── server.js                  # Punto de entrada del servidor Express

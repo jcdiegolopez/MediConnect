@@ -1,0 +1,776 @@
+{
+	"info": {
+		"_postman_id": "5ef3d1a6-8d05-4249-a31b-70a3b8112b5e",
+		"name": "Medical API Collection",
+		"description": "Postman collection for testing the Medical API with endpoints for pacientes, citas, consultas, and reportes, including CSV format support for reports.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42665957",
+		"_collection_link": "https://proyecto-3-db.postman.co/workspace/proyecto-3-db-Workspace~2fbb97dd-b4b0-4b4c-978b-c3a63e31d5ba/collection/42665957-5ef3d1a6-8d05-4249-a31b-70a3b8112b5e?action=share&source=collection_link&creator=42665957"
+	},
+	"item": [
+		{
+			"name": "Pacientes",
+			"item": [
+				{
+					"name": "Create Paciente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"fecha_nacimiento\": \"1990-05-15\",\n  \"correo\": \"juan.perez@example.com\",\n  \"genero\": \"M\",\n  \"telefono\": \"+1234567890\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/pacientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pacientes"
+							]
+						},
+						"description": "Creates a new paciente with required fields and optional fields."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Pacientes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/pacientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pacientes"
+							]
+						},
+						"description": "Retrieves all pacientes."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Paciente by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/pacientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pacientes",
+								"1"
+							]
+						},
+						"description": "Retrieves a paciente by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Paciente",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Alberto\",\n  \"telefono\": \"+0987654321\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/pacientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pacientes",
+								"1"
+							]
+						},
+						"description": "Updates an existing paciente by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Paciente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/pacientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pacientes",
+								"1"
+							]
+						},
+						"description": "Deletes a paciente by ID."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Citas",
+			"item": [
+				{
+					"name": "Create Cita",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paciente_id\": 1,\n  \"doctor_id\": 1,\n  \"clinica_id\": 1,\n  \"fecha\": \"2025-06-01T09:00:00Z\",\n  \"estado\": \"Programada\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/citas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"citas"
+							]
+						},
+						"description": "Creates a new cita with required fields."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Citas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/citas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"citas"
+							],
+							"query": [
+								{
+									"key": "pacienteId",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "doctorId",
+									"value": "4",
+									"disabled": true
+								},
+								{
+									"key": "estado",
+									"value": "Programada",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves all citas."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cita by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/citas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"citas",
+								"1"
+							]
+						},
+						"description": "Retrieves a cita by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cita",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"Completada\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/citas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"citas",
+								"1"
+							]
+						},
+						"description": "Updates an existing cita by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cita",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/citas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"citas",
+								"1"
+							]
+						},
+						"description": "Deletes a cita by ID."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Consultas",
+			"item": [
+				{
+					"name": "Create Consulta",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paciente_id\": 1,\n  \"doctor_id\": 1,\n  \"clinica_id\": 1,\n  \"fecha\": \"2025-06-01T09:00:00Z\",\n  \"diagnostico\": \"Gripe común\",\n  \"notas\": {\n    \"observaciones\": \"Paciente con fiebre leve\",\n    \"sintomas\": \"Tos y dolor de garganta\",\n    \"recomendaciones\": \"Reposo y paracetamol\"\n  }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/consultas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"consultas"
+							]
+						},
+						"description": "Creates a new consulta with required fields."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Consultas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/consultas?pacienteId=5&doctorId=14",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"consultas"
+							],
+							"query": [
+								{
+									"key": "pacienteId",
+									"value": "5"
+								},
+								{
+									"key": "doctorId",
+									"value": "14"
+								}
+							]
+						},
+						"description": "Retrieves all consultas."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Consulta by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/consultas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"consultas",
+								"1"
+							]
+						},
+						"description": "Retrieves a consulta by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"diagnostico\": \"Gripe común mejorada\",\n  \"notas\": {\n    \"observaciones\": \"Paciente con mejoría\",\n    \"sintomas\": \"Tos leve\",\n    \"recomendaciones\": \"Continuar reposo\"\n  }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/consultas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"consultas",
+								"1"
+							]
+						},
+						"description": "Updates an existing consulta by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Consulta",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/consultas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"consultas",
+								"1"
+							]
+						},
+						"description": "Deletes a consulta by ID."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reportes",
+			"item": [
+				{
+					"name": "Patients by Age Group (JSON)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reportes/patients-by-age-group",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reportes",
+								"patients-by-age-group"
+							],
+							"query": [
+								{
+									"key": "clinicaId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "alergia",
+									"value": "Polen",
+									"disabled": true
+								},
+								{
+									"key": "minConsultas",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "fechaRegistroFin",
+									"value": "2025-12-31",
+									"disabled": true
+								},
+								{
+									"key": "fechaRegistroInicio",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "genero",
+									"value": "M",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves patients grouped by age in JSON format with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Patients by Age Group (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reportes/patients-by-age-group",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reportes",
+								"patients-by-age-group"
+							],
+							"query": [
+								{
+									"key": "genero",
+									"value": "M",
+									"disabled": true
+								},
+								{
+									"key": "clinicaId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "alergia",
+									"value": "Polen",
+									"disabled": true
+								},
+								{
+									"key": "minConsultas",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "fechaRegistroInicio",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "fechaRegistroFin",
+									"value": "2025-12-31",
+									"disabled": true
+								},
+								{
+									"key": "format",
+									"value": "csv",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves patients grouped by age in CSV format with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Doctor Consultation Counts (JSON)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reportes/doctor-consultation-counts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reportes",
+								"doctor-consultation-counts"
+							],
+							"query": [
+								{
+									"key": "especialidadId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "clinicaId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "fechaFin",
+									"value": "2025-12-31",
+									"disabled": true
+								},
+								{
+									"key": "diagnostico",
+									"value": "Gripe",
+									"disabled": true
+								},
+								{
+									"key": "minConsultas",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves consultation counts per doctor in JSON format with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Doctor Consultation Counts (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reportes/doctor-consultation-counts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reportes",
+								"doctor-consultation-counts"
+							],
+							"query": [
+								{
+									"key": "especialidadId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "clinicaId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "fechaFin",
+									"value": "2025-12-31",
+									"disabled": true
+								},
+								{
+									"key": "diagnostico",
+									"value": "Gripe",
+									"disabled": true
+								},
+								{
+									"key": "minConsultas",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "format",
+									"value": "csv",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves consultation counts per doctor in CSV format with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Clinic Activity (JSON)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reportes/clinic-activity",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reportes",
+								"clinic-activity"
+							],
+							"query": [
+								{
+									"key": "clinicaId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "fechaFin",
+									"value": "2025-12-31",
+									"disabled": true
+								},
+								{
+									"key": "especialidadId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "genero",
+									"value": "Masculino",
+									"disabled": true
+								},
+								{
+									"key": "diagnostico",
+									"value": "Gripe",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves clinic activity in JSON format with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Clinic Activity (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/reportes/clinic-activity",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"reportes",
+								"clinic-activity"
+							],
+							"query": [
+								{
+									"key": "clinicaId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "fechaFin",
+									"value": "2025-12-31",
+									"disabled": true
+								},
+								{
+									"key": "especialidadId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "genero",
+									"value": "Masculino",
+									"disabled": true
+								},
+								{
+									"key": "diagnostico",
+									"value": "Gripe",
+									"disabled": true
+								},
+								{
+									"key": "format",
+									"value": "csv",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves clinic activity in CSV format with optional filters."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

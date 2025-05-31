@@ -8,7 +8,7 @@ const ReportesController = require('../controllers/reportesController');
 router.get(
   '/patients-by-age-group',
   [
-    check('genero').optional().isIn(['Masculino', 'Femenino']).withMessage('Género debe ser Masculino o Femenino'),
+    check('genero').optional().isIn(['M', 'F']).withMessage('Género debe ser M o F'),
     check('clinicaId').optional().isInt({ min: 1 }).withMessage('Clínica ID debe ser un entero positivo'),
     check('alergia').optional().notEmpty().withMessage('Alergia no puede estar vacía'),
     check('minConsultas').optional().isInt({ min: 0 }).withMessage('Mínimo de consultas debe ser un entero no negativo'),
