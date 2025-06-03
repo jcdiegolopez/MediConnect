@@ -103,20 +103,20 @@ const Dashboard = () => {
                   <th>Estado</th>
                 </tr>
               </thead>
-              <tbody>
-                {recentCitas.map((cita) => (
-                  <tr key={cita.id}>
-                    <td>{cita.paciente_nombre} {cita.paciente_apellido}</td>
-                    <td>Dr. {cita.doctor_nombre} {cita.doctor_apellido}</td>
-                    <td>{new Date(cita.fecha).toLocaleString()}</td>
-                    <td>
-                      <span className={`status-badge status-${cita.estado.toLowerCase()}`}>
-                        {cita.estado}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                <tbody>
+                  {recentCitas.map((cita) => (
+                    <tr key={cita.id}>
+                      <td>{cita.paciente}</td>
+                      <td>{cita.doctor}</td>
+                      <td>{new Date(cita.fecha).toLocaleString()}</td>
+                      <td>
+                        <span className={`status-badge status-${cita.estado.toLowerCase()}`}>
+                          {cita.estado}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
             </table>
           ) : (
             <p>No hay citas registradas</p>

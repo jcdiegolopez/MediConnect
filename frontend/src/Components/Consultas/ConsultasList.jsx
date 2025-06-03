@@ -94,6 +94,7 @@ const ConsultasList = () => {
                 <th>Clínica</th>
                 <th>Fecha</th>
                 <th>Diagnóstico</th>
+                <th>Recetas</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -101,28 +102,14 @@ const ConsultasList = () => {
               {consultas.map((consulta) => (
                 <tr key={consulta.id}>
                   <td>{consulta.id}</td>
-                  <td>{consulta.paciente_nombre} {consulta.paciente_apellido}</td>
-                  <td>Dr. {consulta.doctor_nombre} {consulta.doctor_apellido}</td>
-                  <td>{consulta.clinica_nombre}</td>
+                  <td>{consulta.paciente}</td>
+                  <td>{consulta.doctor}</td>
+                  <td>{consulta.clinica}</td>
                   <td>{new Date(consulta.fecha).toLocaleString()}</td>
                   <td>{consulta.diagnostico}</td>
+                  <td>{consulta.recetas}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <Link
-                        to={`/consultas/editar/${consulta.id}`}
-                        className="btn btn-secondary"
-                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                      >
-                        Editar
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(consulta.id)}
-                        className="btn btn-danger"
-                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
+                    {/* Acciones */}
                   </td>
                 </tr>
               ))}

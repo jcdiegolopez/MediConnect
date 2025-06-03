@@ -101,51 +101,36 @@ const CitasList = () => {
 
         {citas.length > 0 ? (
           <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Paciente</th>
-                <th>Doctor</th>
-                <th>Clínica</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Paciente</th>
+              <th>Doctor</th>
+              <th>Clínica</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {citas.map((cita) => (
+              <tr key={cita.id}>
+                <td>{cita.id}</td>
+                <td>{cita.paciente}</td>
+                <td>{cita.doctor}</td>
+                <td>{cita.clinica}</td>
+                <td>{new Date(cita.fecha).toLocaleString()}</td>
+                <td>
+                  <span className={`status-badge status-${cita.estado.toLowerCase()}`}>
+                    {cita.estado}
+                  </span>
+                </td>
+                <td>
+                  {/* Acciones */}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {citas.map((cita) => (
-                <tr key={cita.id}>
-                  <td>{cita.id}</td>
-                  <td>{cita.paciente_nombre} {cita.paciente_apellido}</td>
-                  <td>Dr. {cita.doctor_nombre} {cita.doctor_apellido}</td>
-                  <td>{cita.clinica_nombre}</td>
-                  <td>{new Date(cita.fecha).toLocaleString()}</td>
-                  <td>
-                    <span className={`status-badge status-${cita.estado.toLowerCase()}`}>
-                      {cita.estado}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <Link
-                        to={`/citas/editar/${cita.id}`}
-                        className="btn btn-secondary"
-                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                      >
-                        Editar
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(cita.id)}
-                        className="btn btn-danger"
-                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            ))}
+          </tbody>
           </table>
         ) : (
           <p>No hay citas registradas</p>

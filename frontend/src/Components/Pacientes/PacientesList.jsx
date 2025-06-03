@@ -55,10 +55,10 @@ const PacientesList = () => {
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
+                <th>Fecha Nacimiento</th>
                 <th>Edad</th>
-                <th>Género</th>
-                <th>Email</th>
-                <th>Teléfono</th>
+                <th>Total Historiales</th>
+                <th>Alergias</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -68,27 +68,12 @@ const PacientesList = () => {
                   <td>{paciente.id}</td>
                   <td>{paciente.nombre}</td>
                   <td>{paciente.apellido}</td>
+                  <td>{paciente.fecha_nacimiento}</td>
                   <td>{paciente.edad}</td>
-                  <td>{paciente.genero}</td>
-                  <td>{paciente.correo}</td>
-                  <td>{paciente.telefono}</td>
+                  <td>{paciente.total_historiales}</td>
+                  <td>{paciente.alergias}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <Link
-                        to={`/pacientes/editar/${paciente.id}`}
-                        className="btn btn-secondary"
-                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                      >
-                        Editar
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(paciente.id)}
-                        className="btn btn-danger"
-                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
+                    {/* Acciones */}
                   </td>
                 </tr>
               ))}
