@@ -64,6 +64,7 @@ class PacientesService {
         throw new Error('Paciente no encontrado');
       }
       if (error.code === 'P2003') {
+        console.error('Error al eliminar paciente:', error);
         throw new Error('No se puede eliminar: paciente tiene citas o consultas asociadas');
       }
       throw error;

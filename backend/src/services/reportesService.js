@@ -149,18 +149,18 @@ class ReportesService {
         : `0 AS total_consultations`;
 
         const data = await prisma.$queryRawUnsafe(`
-        SELECT 
-            cl.nombre AS clinica,
-            AVG(public.calcular_edad(p.fecha_nacimiento))::INTEGER AS avg_patient_age,
-            ${totalConsultationsSQL}
-        FROM public."Consultas" c
-        JOIN public."Pacientes" p ON c.paciente_id = p.id
-        JOIN public."Doctores" d ON c.doctor_id = d.id
-        JOIN public."Clinicas" cl ON c.clinica_id = cl.id
-        ${where}
-        GROUP BY cl.nombre
-        ORDER BY total_consultations DESC
-        `, ...params);
+          SELECT 
+              cl.nombre AS clinica,
+              AVG(public.calcular_edad(p.fecha_nacimiento))::INTEGER AS avg_patient_age,
+              COUNT(c.id)::INTEGER AS total_consultations
+          FROM public."Consultas" c
+          JOIN public."Pacientes" p ON c.paciente_id = p.id
+          JOIN public."Doctores" d ON c.doctor_id = d.id
+          JOIN public."Clinicas" cl ON c.clinica_id = cl.id
+          ${where}
+          GROUP BY cl.nombre
+          ORDER BY total_consultations DESC
+      `, ...params);
 
         return data.map(row => ({
         clinica: row.clinica,

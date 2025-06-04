@@ -24,7 +24,7 @@ model Pacientes {
   telefono        String?
   ultima_consulta DateTime?
   citas           Citas[]
-  consultas       Consultas[]
+  consultas       Consultas[] 
   historiales     Historiales_Medicos[]
   examenes        Examenes_Medicos[]
   facturas        Facturas[]
@@ -69,7 +69,7 @@ model Consultas {
   fecha           DateTime
   diagnostico     String?
   notas           Json
-  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id], onDelete: Cascade)
   doctor          Doctores            @relation(fields: [doctor_id], references: [id])
   clinica         Clinicas            @relation(fields: [clinica_id], references: [id])
   recetas         Recetas[]
@@ -83,7 +83,7 @@ model Historiales_Medicos {
   fecha           DateTime?
   diagnostico     String?
   tratamientos    String?
-  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id], onDelete: Cascade)
 }
 
 model Citas {
@@ -93,7 +93,7 @@ model Citas {
   clinica_id      Int
   fecha           DateTime
   estado          CitasEstado         @default(Programada)
-  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id], onDelete: Cascade)
   doctor          Doctores            @relation(fields: [doctor_id], references: [id])
   clinica         Clinicas            @relation(fields: [clinica_id], references: [id])
 }
@@ -140,7 +140,7 @@ model Examenes_Medicos {
   consulta_id     Int?
   fecha           DateTime
   resultado       String?
-  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id], onDelete: Cascade)
   tipo_examen     Tipos_Examenes      @relation(fields: [tipo_examen_id], references: [id])
   consulta        Consultas?          @relation(fields: [consulta_id], references: [id])
   facturas_items  Facturas_Items[]
@@ -164,7 +164,7 @@ model Doctores_Clinicas {
 model Pacientes_Alergias {
   paciente_id     Int
   alergia_id      Int
-  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id], onDelete: Cascade)
   alergia         Alergias            @relation(fields: [alergia_id], references: [id])
   @@id([paciente_id, alergia_id])
 }
@@ -174,7 +174,7 @@ model Facturas {
   paciente_id     Int
   monto           Decimal
   fecha           DateTime
-  paciente        Pacientes           @relation(fields: [paciente_id], references: [id])
+  paciente        Pacientes           @relation(fields: [paciente_id], references: [id], onDelete: Cascade)
   items           Facturas_Items[]
 }
 
