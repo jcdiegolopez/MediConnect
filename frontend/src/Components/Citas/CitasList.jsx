@@ -126,7 +126,22 @@ const CitasList = () => {
                   </span>
                 </td>
                 <td>
-                  {/* Acciones */}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                      <Link
+                        to={`/citas/editar/${cita.id}`}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '12px', padding: '4px 8px' }}
+                      >
+                        Editar
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(cita.id)}
+                        className="btn btn-danger"
+                        style={{ fontSize: '12px', padding: '4px 8px' }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                 </td>
               </tr>
             ))}

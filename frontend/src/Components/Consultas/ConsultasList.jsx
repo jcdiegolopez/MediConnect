@@ -109,7 +109,22 @@ const ConsultasList = () => {
                   <td>{consulta.diagnostico}</td>
                   <td>{consulta.recetas}</td>
                   <td>
-                    {/* Acciones */}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <Link
+                        to={`/consultas/editar/${consulta.id}`}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '12px', padding: '4px 8px' }}
+                      >
+                        Editar
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(consulta.id)}
+                        className="btn btn-danger"
+                        style={{ fontSize: '12px', padding: '4px 8px' }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

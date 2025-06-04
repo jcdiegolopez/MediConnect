@@ -73,7 +73,22 @@ const PacientesList = () => {
                   <td>{paciente.total_historiales}</td>
                   <td>{paciente.alergias}</td>
                   <td>
-                    {/* Acciones */}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <Link
+                        to={`/pacientes/editar/${paciente.id}`}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '12px', padding: '4px 8px' }}
+                      >
+                        Editar
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(paciente.id)}
+                        className="btn btn-danger"
+                        style={{ fontSize: '12px', padding: '4px 8px' }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
